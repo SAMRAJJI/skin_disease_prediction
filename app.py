@@ -7,15 +7,15 @@ import os
 
 app = Flask(__name__)
 
-# Load model and label encoder
-model = tf.keras.models.load_model("skin_cnn.h5")
+# Load model and LabelEncoder
+model = tf.keras.models.load_model("skin_cnn.keras")
 with open("label_encoder.pkl", "rb") as f:
     le = pickle.load(f)
 
 IMG_SIZE = 64  # same as training
 
-# Folder to store uploaded images temporarily
-UPLOAD_FOLDER = "uploads"
+# Upload folder
+UPLOAD_FOLDER = "static/uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -24,7 +24,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def home():
     return render_template("index.html")
 
-# Handle upload and prediction
+# Prediction route
 @app.route("/predict", methods=["POST"])
 def predict():
     if 'file' not in request.files:
@@ -37,7 +37,7 @@ def predict():
     filepath = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     file.save(filepath)
 
-    # Read & preprocess image
+    # Preprocess image
     img = cv2.imread(filepath)
     img = cv2.resize(img, (IMG_SIZE, IMG_SIZE))
     img = img / 255.0
